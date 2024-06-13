@@ -76,27 +76,24 @@ Ensure the "Contract" dropdown is set to "ErrorHandling".
 Click the "Deploy" button.
  Interact with the Contract After deployment, you will see the deployed contract listed under "Deployed Contracts" at the bottom of the "Deploy & Run Transactions" pane.
 
-Expand the deployed contract instance to see the available functions and state variables.
+In the "Value" field above the function buttons, enter the amount of Ether you want to deposit (e.g., 1 for 1 Ether).
+Click the deposit button. Ensure you have sufficient test Ether in your account.
 
- Testing the Functions
-Increment Function:Ensure the owner account is selected in the "Account" dropdown.
+Withdraw Ether
+Enter the amount you want to withdraw in the _amount field of the withdraw function.
 
-Enter a value (e.g., 5) in the _value field of the increment function and click "transact".
+Click the withdraw button.
 
-The count variable should now be 5.
+Validate Contract
+Click the validateContract button to ensure the contract's balance is non-negative.
 
-Decrement Function:Enter a value (e.g., 2) in the _value field of the decrement function and click "transact".
+Trigger Revert
+Toggle the _triggerRevert parameter to true or false.
 
-The count variable should now be 3.
+Click the demoRevert button to see how revert works when _triggerRevert is true.
 
-Reset Count Function Click the resetCount function button.
-
-The count variable should be reset to 0.
-
-Require Only Owner:Change the account in the "Account" dropdown to a non-owner account.
-Try to call the increment or decrement function, and it should revert with an error message "Caller is not the owner".
-
-# Authors
-Metacrafter Chris
+ Check Balances and Owner
+ 
+You can view the owner address and balance of the contract by clicking the corresponding buttons in the "Deployed Contracts" section.
 
 
