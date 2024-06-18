@@ -97,24 +97,56 @@ Ensure the "Contract" dropdown is set to "ErrorHandling".
 Click the "Deploy" button.
  Interact with the Contract After deployment, you will see the deployed contract listed under "Deployed Contracts" at the bottom of the "Deploy & Run Transactions" pane.
 
-In the "Value" field above the function buttons, enter the amount of Ether you want to deposit (e.g., 1 for 1 Ether).
-Click the deposit button. Ensure you have sufficient test Ether in your account.
+Adding Books (Using Owner Account)
+Select the Owner Account:
 
-Withdraw Ether
-Enter the amount you want to withdraw in the _amount field of the withdraw function.
+In the Account dropdown, ensure the default account (first account in the list) is selected. This is the account that deployed the contract and is the owner.
+Add Books:
 
-Click the withdraw button.
+In the deployed contract section, find the addBook function.
 
-Validate Contract
-Click the validateContract button to ensure the contract's balance is non-negative.
+Input the book title (e.g., "The Great Gatsby").
 
-Trigger Revert
-Toggle the _triggerRevert parameter to true or false.
+Click transact to add the book.
 
-Click the demoRevert button to see how revert works when _triggerRevert is true.
+ Borrowing a Book (Using a Different Account)
+Switch to Another Account (e.g., Account 2):
 
- Check Balances and Owner
- 
-You can view the owner address and balance of the contract by clicking the corresponding buttons in the "Deployed Contracts" section.
+In the Account dropdown, select another account (e.g., the second account in the list).
+Borrow a Book:
 
+In the deployed contract section, find the borrowBook function.
 
+Input the book ID (e.g., 1 for "The Great Gatsby").
+
+Click transact to borrow the book.
+
+ Returning a Book (Using the Same Account)
+
+Ensure the Same Account is Selected (e.g., Account 2):
+
+Confirm that the account which borrowed the book is still selected.
+Return the Book:
+
+In the deployed contract section, find the returnBook function.
+
+Input the book ID (e.g., 1 for "The Great Gatsby").
+
+Click transact to return the book.
+ Viewing Books and Borrowed Books
+
+View Details of a Specific Book:
+
+In the deployed contract section, find the books function.
+
+Input the book ID (e.g., 1).
+
+Click call to see the book details (ID, title, availability).
+
+Check Which Book an Address Borrowed:
+
+In the deployed contract section, find the borrowedBooks function.
+
+Input the borrower's address (copy the address from the Account dropdown).
+
+Click call to see the ID of the book borrowed by that address.
