@@ -150,3 +150,10 @@ In the deployed contract section, find the borrowedBooks function.
 Input the borrower's address (copy the address from the Account dropdown).
 
 Click call to see the ID of the book borrowed by that address.
+
+# Authors
+Metacrafter Chris
+
+#  License
+This project is licensed under the MIT License.
+
