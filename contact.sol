@@ -1,61 +1,62 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-contract Library {
-    struct Book {
-        uint id;
-        string title;
-        bool isAvailable;
-    }
-
+contract AssertionContract {
+    uint256 public totalValue;
     address public owner;
-    mapping (uint => Book) public books;
-    mapping (address => uint) public borrowedBooks;
-    uint public booksCount;
 
-    event LogBookAdded(uint id, string title);
-    event LogBookBorrowed(uint id, address borrower);
-    event LogBookReturned(uint id, address borrower);
-    event LogBookList(uint id, string title, bool isAvailable);
+    // Events
+    event ValueUpdated(uint256 newValue);
+    event ValueIncreased(uint256 amount, uint256 newValue);
+    event ValueRemoved(uint256 amount, uint256 newValue);
+    event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
 
+    // Constructor to set the initial owner
     constructor() {
         owner = msg.sender;
+        emit OwnershipTransferred(address(0), owner);
     }
 
-    function addBook(string memory _title) public {
-        require(msg.sender == owner, "Only the owner can add books");
-        require(bytes(_title).length > 0, "Title cannot be empty");
-
-        booksCount++;
-        books[booksCount] = Book(booksCount, _title, true);
-        emit LogBookAdded(booksCount, _title);
+    // Modifier to restrict function access to the owner
+    modifier onlyOwner() {
+        require(msg.sender == owner, "Caller is not the owner");
+        _;
     }
 
-    function borrowBook(uint _bookId) public {
-        require(msg.sender != address(0), "Invalid sender address");
-        require(_bookId > 0 && _bookId <= booksCount, "Invalid book ID");
-        require(books[_bookId].isAvailable, "Book is not available");
-
-        books[_bookId].isAvailable = false;
-        borrowedBooks[msg.sender] = _bookId;
-        emit LogBookBorrowed(_bookId, msg.sender);
+    // Function to transfer ownership
+    function transferOwnership(address newOwner) external onlyOwner {
+        require(newOwner != address(0), "New owner is the zero address");
+        emit OwnershipTransferred(owner, newOwner);
+        owner = newOwner;
     }
 
-    function returnBook(uint _bookId) public {
-        require(msg.sender != address(0), "Invalid sender address");
-        require(_bookId > 0 && _bookId <= booksCount, "Invalid book ID");
-        require(!books[_bookId].isAvailable, "Book is already available");
-        require(borrowedBooks[msg.sender] == _bookId, "You did not borrow this book");
-
-        books[_bookId].isAvailable = true;
-        delete borrowedBooks[msg.sender];
-        emit LogBookReturned(_bookId, msg.sender);
+    // require() to ensure valid inputs.
+    function updateValue(uint256 _value) external onlyOwner {
+        require(_value > 0, "Value must be greater than zero");
+        totalValue = _value;
+        emit ValueUpdated(_value);
     }
 
-    function viewBooks() public {
-        for (uint i = 1; i <= booksCount; i++) {
-            Book memory book = books[i];
-            emit LogBookList(book.id, book.title, book.isAvailable);
+    // assert() to check for invariants.
+    function increaseValue(uint256 _value) external onlyOwner {
+        uint256 oldValue = totalValue;
+        uint256 newValue = oldValue + _value;
+        assert(newValue >= oldValue); // Check for overflow
+        totalValue = newValue;
+        emit ValueIncreased(_value, newValue);
+    }
+
+    // revert() to handle exceptional cases.
+    function removeValue(uint256 _amount) external onlyOwner {
+        require(_amount <= totalValue, "Not enough balance");
+        totalValue -= _amount;
+        emit ValueRemoved(_amount, totalValue);
+
+        // Simulate a failure scenario with a specific condition.
+        if (_amount > 100) {
+            revert("Withdrawal amount should not exceed 100");
         }
+        
+        // Withdraw logic here
     }
 }
