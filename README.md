@@ -106,9 +106,13 @@ Expand the deployed contract to see the available functions.
 Testing the Functions:
 
 updateValue: Enter a value greater than 0 and click updateValue. Check totalValue to see if it updates correctly. An event ValueUpdated will be logged.
+
 increaseValue: Enter a value and click increaseValue. Check totalValue to see if it increases by the specified amount. An event ValueIncreased will be logged.
+
 removeValue: Enter an amount less than or equal to totalValue and click removeValue. Check totalValue to see if it decreases correctly. An event ValueRemoved will be logged. Enter an amount greater than 100 to test the revert condition.
+
 transferOwnership: Enter a new owner address and click transferOwnership to change the owner. An event OwnershipTransferred will be logged.
 
+# License
 This project is licensed under the MIT License.
 
