@@ -57,6 +57,6 @@ contract AssertionContract {
             revert("Withdrawal amount should not exceed 100");
         }
         
-        // Withdraw logic here
+        
     }
 }
