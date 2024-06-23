@@ -20,68 +20,72 @@ To run this program, you can use Remix, an online Solidity IDE. To get started, 
 
 Once you are on the Remix website, create a new file by clicking on the "+" icon in the left-hand sidebar. Save the file with a .sol extension. (e.g., Smart contact .sol).Copy and paste the following code into the file:
 ```
-
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-contract Library {
-    struct Book {
-        uint id;
-        string title;
-        bool isAvailable;
-    }
-
+contract AssertionContract {
+    uint256 public totalValue;
     address public owner;
-    mapping (uint => Book) public books;
-    mapping (address => uint) public borrowedBooks;
-    uint public booksCount;
 
-    event LogBookAdded(uint id, string title);
-    event LogBookBorrowed(uint id, address borrower);
-    event LogBookReturned(uint id, address borrower);
-    event LogBookList(uint id, string title, bool isAvailable);
+    // Events
+    event ValueUpdated(uint256 newValue);
+    event ValueIncreased(uint256 amount, uint256 newValue);
+    event ValueRemoved(uint256 amount, uint256 newValue);
+    event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
 
+    // Constructor to set the initial owner
     constructor() {
         owner = msg.sender;
+        emit OwnershipTransferred(address(0), owner);
     }
 
-    function addBook(string memory _title) public {
-        require(msg.sender == owner, "Only the owner can add books");
-        require(bytes(_title).length > 0, "Title cannot be empty");
-
-        booksCount++;
-        books[booksCount] = Book(booksCount, _title, true);
-        emit LogBookAdded(booksCount, _title);
+    // Modifier to restrict function access to the owner
+    modifier onlyOwner() {
+        require(msg.sender == owner, "Caller is not the owner");
+        _;
     }
 
-    function borrowBook(uint _bookId) public {
-        require(msg.sender != address(0), "Invalid sender address");
-        require(_bookId > 0 && _bookId <= booksCount, "Invalid book ID");
-        require(books[_bookId].isAvailable, "Book is not available");
-
-        books[_bookId].isAvailable = false;
-        borrowedBooks[msg.sender] = _bookId;
-        emit LogBookBorrowed(_bookId, msg.sender);
+    // Function to transfer ownership
+    function transferOwnership(address newOwner) external onlyOwner {
+        require(newOwner != address(0), "New owner is the zero address");
+        emit OwnershipTransferred(owner, newOwner);
+        owner = newOwner;
     }
 
-    function returnBook(uint _bookId) public {
-        require(msg.sender != address(0), "Invalid sender address");
-        require(_bookId > 0 && _bookId <= booksCount, "Invalid book ID");
-        require(!books[_bookId].isAvailable, "Book is already available");
-        require(borrowedBooks[msg.sender] == _bookId, "You did not borrow this book");
-
-        books[_bookId].isAvailable = true;
-        delete borrowedBooks[msg.sender];
-        emit LogBookReturned(_bookId, msg.sender);
+    // require() to ensure valid inputs.
+    function updateValue(uint256 _value) external onlyOwner {
+        require(_value > 0, "Value must be greater than zero");
+        totalValue = _value;
+        emit ValueUpdated(_value);
     }
 
-    function viewBooks() public {
-        for (uint i = 1; i <= booksCount; i++) {
-            Book memory book = books[i];
-            emit LogBookList(book.id, book.title, book.isAvailable);
+    // assert() to check for invariants.
+    function increaseValue(uint256 _value) external onlyOwner {
+        uint256 oldValue = totalValue;
+        uint256 newValue = oldValue + _value;
+        assert(newValue >= oldValue); // Check for overflow
+        totalValue = newValue;
+        emit ValueIncreased(_value, newValue);
+    }
+
+    // revert() to handle exceptional cases.
+    function removeValue(uint256 _amount) external onlyOwner {
+        require(_amount <= totalValue, "Not enough balance");
+        totalValue -= _amount;
+        emit ValueRemoved(_amount, totalValue);
+
+        // Simulate a failure scenario with a specific condition.
+        if (_amount > 100) {
+            revert("Withdrawal amount should not exceed 100");
         }
+        
+        
     }
 }
+
+
+
+       
 
 ```
 
@@ -97,63 +101,14 @@ Ensure the "Contract" dropdown is set to "ErrorHandling".
 Click the "Deploy" button.
  Interact with the Contract After deployment, you will see the deployed contract listed under "Deployed Contracts" at the bottom of the "Deploy & Run Transactions" pane.
 
-Adding Books (Using Owner Account)
-Select the Owner Account:
+After deployment, you will see the deployed contract under "Deployed Contracts".
+Expand the deployed contract to see the available functions.
+Testing the Functions:
 
-In the Account dropdown, ensure the default account (first account in the list) is selected. This is the account that deployed the contract and is the owner.
-Add Books:
+updateValue: Enter a value greater than 0 and click updateValue. Check totalValue to see if it updates correctly. An event ValueUpdated will be logged.
+increaseValue: Enter a value and click increaseValue. Check totalValue to see if it increases by the specified amount. An event ValueIncreased will be logged.
+removeValue: Enter an amount less than or equal to totalValue and click removeValue. Check totalValue to see if it decreases correctly. An event ValueRemoved will be logged. Enter an amount greater than 100 to test the revert condition.
+transferOwnership: Enter a new owner address and click transferOwnership to change the owner. An event OwnershipTransferred will be logged.
 
-In the deployed contract section, find the addBook function.
-
-Input the book title (e.g., "The Great Gatsby").
-
-Click transact to add the book.
-
- Borrowing a Book (Using a Different Account)
-Switch to Another Account (e.g., Account 2):
-
-In the Account dropdown, select another account (e.g., the second account in the list).
-Borrow a Book:
-
-In the deployed contract section, find the borrowBook function.
-
-Input the book ID (e.g., 1 for "The Great Gatsby").
-
-Click transact to borrow the book.
-
- Returning a Book (Using the Same Account)
-
-Ensure the Same Account is Selected (e.g., Account 2):
-
-Confirm that the account which borrowed the book is still selected.
-Return the Book:
-
-In the deployed contract section, find the returnBook function.
-
-Input the book ID (e.g., 1 for "The Great Gatsby").
-
-Click transact to return the book.
- Viewing Books and Borrowed Books
-
-View Details of a Specific Book:
-
-In the deployed contract section, find the books function.
-
-Input the book ID (e.g., 1).
-
-Click call to see the book details (ID, title, availability).
-
-Check Which Book an Address Borrowed:
-
-In the deployed contract section, find the borrowedBooks function.
-
-Input the borrower's address (copy the address from the Account dropdown).
-
-Click call to see the ID of the book borrowed by that address.
-
-# Authors
-Metacrafter Chris
-
-#  License
 This project is licensed under the MIT License.
 
